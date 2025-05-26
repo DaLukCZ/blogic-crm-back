@@ -1,0 +1,6 @@
+@blogic_crm_back_HostAddress = http://localhost:5002
+
+GET {{blogic_crm_back_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
