@@ -8,18 +8,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace blogic_crm_back.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCleanState : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Institutions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Institutions", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -32,16 +45,15 @@ namespace blogic_crm_back.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CountryCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SSN = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CountryCode = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true),
+                    Number = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
+                    SSN = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -60,8 +72,8 @@ namespace blogic_crm_back.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Institution = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    InstitutionId = table.Column<int>(type: "int", nullable: false),
                     DateSigned = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateValidFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateValidTo = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -71,6 +83,12 @@ namespace blogic_crm_back.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Contracts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Contracts_Institutions_InstitutionId",
+                        column: x => x.InstitutionId,
+                        principalTable: "Institutions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Contracts_Users_ClientId",
                         column: x => x.ClientId,
@@ -130,6 +148,11 @@ namespace blogic_crm_back.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Contracts_InstitutionId",
+                table: "Contracts",
+                column: "InstitutionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Contracts_ManagerId",
                 table: "Contracts",
                 column: "ManagerId");
@@ -148,6 +171,9 @@ namespace blogic_crm_back.Migrations
 
             migrationBuilder.DropTable(
                 name: "Contracts");
+
+            migrationBuilder.DropTable(
+                name: "Institutions");
 
             migrationBuilder.DropTable(
                 name: "Users");

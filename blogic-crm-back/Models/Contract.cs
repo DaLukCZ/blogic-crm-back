@@ -1,28 +1,45 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace blogic_crm_back.Models;
 
-// Smlouva klienta se správou poradce
+// Client's contract managed by an advisor
 public class Contract
 {
+    [Key]
     public int Id { get; set; }
 
     [Required]
+    [MaxLength(255)]
     public string ReferenceNumber { get; set; } = string.Empty;
 
+    // Foreign key to Institution
     [Required]
-    public string Institution { get; set; } = string.Empty;
+    [ForeignKey(nameof(Institution))]
+    public int InstitutionId { get; set; }
 
+    public Institution? Institution { get; set; }
+
+    [Required]
     public DateTime DateSigned { get; set; }
+
+    [Required]
     public DateTime DateValidFrom { get; set; }
+
     public DateTime? DateValidTo { get; set; }
 
-    // FK na klienta
+    // Foreign key to Client (User)
+    [Required]
+    [ForeignKey(nameof(Client))]
     public int ClientId { get; set; }
+
     public User? Client { get; set; }
 
-    // FK na hlavního správce smlouvy (poradce)
+    // Foreign key to Manager (User)
+    [Required]
+    [ForeignKey(nameof(Manager))]
     public int ManagerId { get; set; }
+
     public User? Manager { get; set; }
 
     public ICollection<ContractAdvisor>? ContractAdvisors { get; set; }

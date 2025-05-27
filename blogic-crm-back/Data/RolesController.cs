@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using blogic_crm_back.Data;
 using blogic_crm_back.Models;
 
-namespace blogic_crm_back.Controllers
+namespace blogic_crm_back.Data
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class RolesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

@@ -1,19 +1,16 @@
-﻿using blogic_crm_back.Data;
-using blogic_crm_back.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using blogic_crm_back.Models;
 
-namespace blogic_crm_back.Controllers
+namespace blogic_crm_back.Data
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ContractAdvisorsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

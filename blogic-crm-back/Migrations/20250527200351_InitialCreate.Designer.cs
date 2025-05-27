@@ -12,7 +12,7 @@ using blogic_crm_back.Data;
 namespace blogic_crm_back.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250526155206_InitialCreate")]
+    [Migration("20250527200351_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -45,20 +45,22 @@ namespace blogic_crm_back.Migrations
                     b.Property<DateTime?>("DateValidTo")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Institution")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("InstitutionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ManagerId")
                         .HasColumnType("int");
 
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("InstitutionId");
 
                     b.HasIndex("ManagerId");
 
@@ -80,6 +82,24 @@ namespace blogic_crm_back.Migrations
                     b.ToTable("ContractAdvisors");
                 });
 
+            modelBuilder.Entity("blogic_crm_back.Models.Institution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Institutions");
+                });
+
             modelBuilder.Entity("blogic_crm_back.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -90,7 +110,8 @@ namespace blogic_crm_back.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -122,37 +143,42 @@ namespace blogic_crm_back.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CountryCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Number")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("SSN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -169,6 +195,12 @@ namespace blogic_crm_back.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("blogic_crm_back.Models.Institution", "Institution")
+                        .WithMany("Contracts")
+                        .HasForeignKey("InstitutionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("blogic_crm_back.Models.User", "Manager")
                         .WithMany("ManagedContracts")
                         .HasForeignKey("ManagerId")
@@ -176,6 +208,8 @@ namespace blogic_crm_back.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+
+                    b.Navigation("Institution");
 
                     b.Navigation("Manager");
                 });
@@ -213,6 +247,11 @@ namespace blogic_crm_back.Migrations
             modelBuilder.Entity("blogic_crm_back.Models.Contract", b =>
                 {
                     b.Navigation("ContractAdvisors");
+                });
+
+            modelBuilder.Entity("blogic_crm_back.Models.Institution", b =>
+                {
+                    b.Navigation("Contracts");
                 });
 
             modelBuilder.Entity("blogic_crm_back.Models.Role", b =>

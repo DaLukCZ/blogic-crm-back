@@ -1,6 +1,8 @@
 ﻿using blogic_crm_back.Data;
+using blogic_crm_back.Models;
 using blogic_crm_back.Models.Auth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,25 +18,33 @@ namespace blogic_crm_back.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _config;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public AuthController(ApplicationDbContext context, IConfiguration config)
+        public AuthController(ApplicationDbContext context, IConfiguration config, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
             _config = config;
+            _passwordHasher = passwordHasher;
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Username == request.Username);
 
-            if (user == null || user.PasswordHash != request.Password)
-            {
+            if (user == null)
                 return Unauthorized("Invalid credentials");
-            }
+
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+
+            if (result == PasswordVerificationResult.Failed)
+                return Unauthorized("Invalid credentials");
 
             var token = GenerateJwtToken(user);
 
@@ -46,9 +56,13 @@ namespace blogic_crm_back.Controllers
             });
         }
 
-        private string GenerateJwtToken(blogic_crm_back.Models.User user)
+        private string GenerateJwtToken(User user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            var keyString = _config["Jwt:Key"];
+            if (string.IsNullOrEmpty(keyString))
+                throw new Exception("JWT key not configured");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]

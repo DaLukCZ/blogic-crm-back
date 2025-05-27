@@ -1,16 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace blogic_crm_back.Models;
 
-// User role (e.g., "client", "advisor", "admin")
-public class Role
+public class Institution
 {
     [Key]
     public int Id { get; set; }
 
     [Required]
-    [MaxLength(50)]
+    [MaxLength(255)]
     public string Name { get; set; } = string.Empty;
 
-    public ICollection<User>? Users { get; set; }
+    public ICollection<Contract>? Contracts { get; set; }
 }
