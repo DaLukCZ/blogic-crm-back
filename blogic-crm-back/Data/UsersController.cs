@@ -70,8 +70,17 @@ namespace blogic_crm_back.Data
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            if (_context.Users.Any(u => u.Username == user.Username))
+            if (await _context.Users.AnyAsync(u => u.Username == user.Username))
                 return BadRequest("Uživatelské jméno už existuje.");
+
+            if (await _context.Users.AnyAsync(u => u.Email == user.Email))
+                return BadRequest("E-mail už existuje.");
+
+            if (await _context.Users.AnyAsync(u => u.Number == user.Number && u.CountryCode == user.CountryCode))
+                return BadRequest("Telefonní číslo už existuje.");
+
+            if (await _context.Users.AnyAsync(u => u.SSN == user.SSN))
+                return BadRequest("Rodné číslo už existuje.");
 
             user.PasswordHash = _passwordHasher.HashPassword(user, user.PasswordHash);
 
@@ -80,6 +89,7 @@ namespace blogic_crm_back.Data
 
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
+
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]

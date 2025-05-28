@@ -30,9 +30,6 @@ namespace blogic_crm_back.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateSigned")
                         .HasColumnType("datetime2");
 
@@ -45,38 +42,36 @@ namespace blogic_crm_back.Migrations
                     b.Property<int>("InstitutionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ManagerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.HasKey("Id");
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("ClientId");
+                    b.HasKey("Id");
 
                     b.HasIndex("InstitutionId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Contracts");
                 });
 
-            modelBuilder.Entity("blogic_crm_back.Models.ContractAdvisor", b =>
+            modelBuilder.Entity("blogic_crm_back.Models.ContractUser", b =>
                 {
                     b.Property<int>("ContractId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AdvisorId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("ContractId", "AdvisorId");
+                    b.HasKey("ContractId", "UserId");
 
-                    b.HasIndex("AdvisorId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("ContractAdvisors");
+                    b.ToTable("ContractUser");
                 });
 
             modelBuilder.Entity("blogic_crm_back.Models.Institution", b =>
@@ -118,17 +113,17 @@ namespace blogic_crm_back.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "klient"
+                            Name = "Klient"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "poradce"
+                            Name = "Poradce"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "admin"
+                            Name = "Admin"
                         });
                 });
 
@@ -186,48 +181,36 @@ namespace blogic_crm_back.Migrations
 
             modelBuilder.Entity("blogic_crm_back.Models.Contract", b =>
                 {
-                    b.HasOne("blogic_crm_back.Models.User", "Client")
-                        .WithMany("ClientContracts")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("blogic_crm_back.Models.Institution", "Institution")
                         .WithMany("Contracts")
                         .HasForeignKey("InstitutionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("blogic_crm_back.Models.User", "Manager")
-                        .WithMany("ManagedContracts")
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Client");
+                    b.HasOne("blogic_crm_back.Models.User", null)
+                        .WithMany("ClientContracts")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Institution");
-
-                    b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("blogic_crm_back.Models.ContractAdvisor", b =>
+            modelBuilder.Entity("blogic_crm_back.Models.ContractUser", b =>
                 {
-                    b.HasOne("blogic_crm_back.Models.User", "Advisor")
-                        .WithMany("ContractAdvisors")
-                        .HasForeignKey("AdvisorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("blogic_crm_back.Models.Contract", "Contract")
-                        .WithMany("ContractAdvisors")
+                        .WithMany("Users")
                         .HasForeignKey("ContractId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Advisor");
+                    b.HasOne("blogic_crm_back.Models.User", "User")
+                        .WithMany("AdvisorContracts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Contract");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("blogic_crm_back.Models.User", b =>
@@ -243,7 +226,7 @@ namespace blogic_crm_back.Migrations
 
             modelBuilder.Entity("blogic_crm_back.Models.Contract", b =>
                 {
-                    b.Navigation("ContractAdvisors");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("blogic_crm_back.Models.Institution", b =>
@@ -258,11 +241,9 @@ namespace blogic_crm_back.Migrations
 
             modelBuilder.Entity("blogic_crm_back.Models.User", b =>
                 {
+                    b.Navigation("AdvisorContracts");
+
                     b.Navigation("ClientContracts");
-
-                    b.Navigation("ContractAdvisors");
-
-                    b.Navigation("ManagedContracts");
                 });
 #pragma warning restore 612, 618
         }

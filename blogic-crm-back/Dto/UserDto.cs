@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace blogic_crm_back.Models.Auth
+namespace blogic_crm_back.Dto
 {
-    public class LoginResponse
+    public class UserDto
     {
         [Required]
         [MaxLength(2000)]
@@ -15,5 +15,13 @@ namespace blogic_crm_back.Models.Auth
         [Required]
         [MaxLength(255)]
         public string Username { get; set; } = string.Empty;
+
+        public int Id { get; set; }
+
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+
+        public string RoleName { get; set; } = string.Empty;
     }
 }

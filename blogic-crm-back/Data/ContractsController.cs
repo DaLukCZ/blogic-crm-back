@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using blogic_crm_back.Models;
+using blogic_crm_back.Dto;
 
 namespace blogic_crm_back.Data
 {
@@ -21,29 +22,75 @@ namespace blogic_crm_back.Data
         }
 
         // GET: api/Contracts
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Contract>>> GetContracts()
-        {
-            return await _context.Contracts.ToListAsync();
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ContractDto>>> GetContracts()
+    {
+        var contracts = await _context.Contracts
+            .Include(c => c.Institution)
+            .Include(c => c.Users)
+                .ThenInclude(cu => cu.User)
+                    .ThenInclude(u => u.Role)
+            .ToListAsync();
 
-        // GET: api/Contracts/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Contract>> GetContract(int id)
+        var contractDtos = contracts.Select(c => new ContractDto
         {
-            var contract = await _context.Contracts.FindAsync(id);
-
-            if (contract == null)
+            Id = c.Id,
+            ReferenceNumber = c.ReferenceNumber,
+            InstitutionName = c.Institution?.Name,
+            DateSigned = c.DateSigned,
+            DateValidFrom = c.DateValidFrom,
+            DateValidTo = c.DateValidTo,
+            Users = c.Users.Select(cu => new UserDto
             {
-                return NotFound();
-            }
+                Id = cu.User.Id,
+                Username = cu.User.Username,
+                FirstName = cu.User.FirstName,
+                LastName = cu.User.LastName,
+                RoleName = cu.User.Role?.Name
+            }).ToList()
+        }).ToList();
 
-            return contract;
-        }
+        return contractDtos;
+    }
 
-        // PUT: api/Contracts/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ContractDto>> GetContract(int id)
+    {
+        var contract = await _context.Contracts
+            .Include(c => c.Institution)
+            .Include(c => c.Users)
+                .ThenInclude(cu => cu.User)
+                    .ThenInclude(u => u.Role)
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (contract == null)
+            return NotFound();
+
+        var contractDto = new ContractDto
+        {
+            Id = contract.Id,
+            ReferenceNumber = contract.ReferenceNumber,
+            InstitutionName = contract.Institution?.Name,
+            DateSigned = contract.DateSigned,
+            DateValidFrom = contract.DateValidFrom,
+            DateValidTo = contract.DateValidTo,
+            Users = contract.Users.Select(cu => new UserDto
+            {
+                Id = cu.User.Id,
+                Username = cu.User.Username,
+                FirstName = cu.User.FirstName,
+                LastName = cu.User.LastName,
+                RoleName = cu.User.Role?.Name
+            }).ToList()
+        };
+
+        return contractDto;
+    }
+
+
+
+    // PUT: api/Contracts/5
+    [HttpPut("{id}")]
         public async Task<IActionResult> PutContract(int id, Contract contract)
         {
             if (id != contract.Id)
@@ -73,14 +120,26 @@ namespace blogic_crm_back.Data
         }
 
         // POST: api/Contracts
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Contract>> PostContract(Contract contract)
         {
+            // Uložit samotnou smlouvu
             _context.Contracts.Add(contract);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetContract", new { id = contract.Id }, contract);
+            // Přidat vazby na uživatele (klienti i poradci)
+            foreach (var userId in contract.UserIds.Distinct())
+            {
+                _context.ContractUser.Add(new ContractUser
+                {
+                    ContractId = contract.Id,
+                    UserId = userId
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetContract), new { id = contract.Id }, contract);
         }
 
         // DELETE: api/Contracts/5

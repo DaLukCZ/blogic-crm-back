@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace blogic_crm_back.Models.Auth
+namespace blogic_crm_back.Dto
 {
     public class LoginRequest
     {

@@ -1,6 +1,6 @@
 ﻿using blogic_crm_back.Data;
+using blogic_crm_back.Dto;
 using blogic_crm_back.Models;
-using blogic_crm_back.Models.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -48,11 +48,11 @@ namespace blogic_crm_back.Controllers
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new LoginResponse
+            return Ok(new UserDto
             {
                 Token = token,
                 Username = user.Username,
-                Role = user.Role?.Name ?? "unknown"
+                Role = user.Role?.Name ?? "Klient"
             });
         }
 

@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// CORS pro Vue frontend
+// Vue frontend
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
@@ -50,12 +50,13 @@ builder.Services.AddCors(options =>
 // Pøidání hasheru pro seed
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-// Pøidání controllerù
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
+
 
 
 // Swagger s JWT podporou
@@ -92,7 +93,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Swagger pouze ve vývoji
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -101,16 +101,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Aktivace CORS
 app.UseCors(MyAllowSpecificOrigins);
 
-// JWT middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Seed dat
 DbInitializer.Seed(app);
 
 app.Run();

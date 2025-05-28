@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace blogic_crm_back.Models;
 
-// Client's contract managed by an advisor
 public class Contract
 {
     [Key]
@@ -13,7 +12,6 @@ public class Contract
     [MaxLength(255)]
     public string ReferenceNumber { get; set; } = string.Empty;
 
-    // Foreign key to Institution
     [Required]
     [ForeignKey(nameof(Institution))]
     public int InstitutionId { get; set; }
@@ -28,19 +26,18 @@ public class Contract
 
     public DateTime? DateValidTo { get; set; }
 
-    // Foreign key to Client (User)
-    [Required]
-    [ForeignKey(nameof(Client))]
-    public int ClientId { get; set; }
+    public ICollection<ContractUser> Users { get; set; } = new List<ContractUser>();
 
-    public User? Client { get; set; }
+    [NotMapped]
+    public List<int> UserIds { get; set; } = new();
 
-    // Foreign key to Manager (User)
-    [Required]
-    [ForeignKey(nameof(Manager))]
-    public int ManagerId { get; set; }
+    [NotMapped]
+    public IEnumerable<User> Clients => Users
+        .Where(cu => cu.User != null && cu.User.Role?.Name == "klient")
+        .Select(cu => cu.User!);
 
-    public User? Manager { get; set; }
-
-    public ICollection<ContractAdvisor>? ContractAdvisors { get; set; }
+    [NotMapped]
+    public IEnumerable<User> Advisors => Users
+        .Where(cu => cu.User != null && cu.User.Role?.Name == "poradce")
+        .Select(cu => cu.User!);
 }

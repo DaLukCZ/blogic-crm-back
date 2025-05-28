@@ -24,14 +24,24 @@ namespace blogic_crm_back.Data
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Institution>>> GetInstitutions()
         {
-            return await _context.Institutions.ToListAsync();
+            return await _context.Institutions
+                .Include(i => i.Contracts)
+                    .ThenInclude(c => c.Users)
+                        .ThenInclude(cu => cu.User)
+                            .ThenInclude(u => u.Role)
+                .ToListAsync();
         }
 
         // GET: api/Institutions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Institution>> GetInstitution(int id)
         {
-            var institution = await _context.Institutions.FindAsync(id);
+            var institution = await _context.Institutions
+                .Include(i => i.Contracts)
+                    .ThenInclude(c => c.Users)
+                        .ThenInclude(cu => cu.User)
+                            .ThenInclude(u => u.Role)
+                .FirstOrDefaultAsync(i => i.Id == id);
 
             if (institution == null)
             {
@@ -42,7 +52,6 @@ namespace blogic_crm_back.Data
         }
 
         // PUT: api/Institutions/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutInstitution(int id, Institution institution)
         {
@@ -73,14 +82,13 @@ namespace blogic_crm_back.Data
         }
 
         // POST: api/Institutions
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Institution>> PostInstitution(Institution institution)
         {
             _context.Institutions.Add(institution);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetInstitution", new { id = institution.Id }, institution);
+            return CreatedAtAction(nameof(GetInstitution), new { id = institution.Id }, institution);
         }
 
         // DELETE: api/Institutions/5

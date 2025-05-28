@@ -77,8 +77,7 @@ namespace blogic_crm_back.Migrations
                     DateSigned = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateValidFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateValidTo = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    ManagerId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -90,38 +89,31 @@ namespace blogic_crm_back.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Contracts_Users_ClientId",
-                        column: x => x.ClientId,
+                        name: "FK_Contracts_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Contracts_Users_ManagerId",
-                        column: x => x.ManagerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "ContractAdvisors",
+                name: "ContractUser",
                 columns: table => new
                 {
                     ContractId = table.Column<int>(type: "int", nullable: false),
-                    AdvisorId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ContractAdvisors", x => new { x.ContractId, x.AdvisorId });
+                    table.PrimaryKey("PK_ContractUser", x => new { x.ContractId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_ContractAdvisors_Contracts_ContractId",
+                        name: "FK_ContractUser_Contracts_ContractId",
                         column: x => x.ContractId,
                         principalTable: "Contracts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ContractAdvisors_Users_AdvisorId",
-                        column: x => x.AdvisorId,
+                        name: "FK_ContractUser_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -132,20 +124,10 @@ namespace blogic_crm_back.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "klient" },
-                    { 2, "poradce" },
-                    { 3, "admin" }
+                    { 1, "Klient" },
+                    { 2, "Poradce" },
+                    { 3, "Admin" }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ContractAdvisors_AdvisorId",
-                table: "ContractAdvisors",
-                column: "AdvisorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Contracts_ClientId",
-                table: "Contracts",
-                column: "ClientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Contracts_InstitutionId",
@@ -153,9 +135,14 @@ namespace blogic_crm_back.Migrations
                 column: "InstitutionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Contracts_ManagerId",
+                name: "IX_Contracts_UserId",
                 table: "Contracts",
-                column: "ManagerId");
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContractUser_UserId",
+                table: "ContractUser",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
@@ -167,7 +154,7 @@ namespace blogic_crm_back.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ContractAdvisors");
+                name: "ContractUser");
 
             migrationBuilder.DropTable(
                 name: "Contracts");

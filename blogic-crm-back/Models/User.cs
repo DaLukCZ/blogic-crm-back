@@ -2,7 +2,6 @@
 
 namespace blogic_crm_back.Models;
 
-// User (client, advisor, admin, etc.)
 public class User
 {
     [Key]
@@ -40,12 +39,7 @@ public class User
     [MaxLength(10)]
     public string? SSN { get; set; }
 
-    // Contracts where the user is a client
-    public ICollection<Contract>? ClientContracts { get; set; }
+    public ICollection<Contract> ClientContracts { get; set; } = new List<Contract>();
 
-    // Contracts where the user is the manager (main advisor)
-    public ICollection<Contract>? ManagedContracts { get; set; }
-
-    // Additional participation as advisor (many-to-many)
-    public ICollection<ContractAdvisor>? ContractAdvisors { get; set; }
+    public ICollection<ContractUser> AdvisorContracts { get; set; } = new List<ContractUser>();
 }
