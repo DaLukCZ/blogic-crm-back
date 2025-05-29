@@ -2,7 +2,7 @@
 
 namespace blogic_crm_back.Models;
 
-// User role (e.g., "client", "advisor", "admin")
+// User role ("¨Klient", "Poradce", "Admin")
 public class Role
 {
     [Key]

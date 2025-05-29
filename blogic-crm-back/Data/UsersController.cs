@@ -1,7 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using blogic_crm_back.Models;
+using blogic_crm_back.Dto;
+using System.Security.Claims;
 
 namespace blogic_crm_back.Data
 {
@@ -27,7 +34,7 @@ namespace blogic_crm_back.Data
                 .ToListAsync();
         }
 
-
+        // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
@@ -40,7 +47,6 @@ namespace blogic_crm_back.Data
 
             return user;
         }
-
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
@@ -62,6 +68,35 @@ namespace blogic_crm_back.Data
                 else
                     throw;
             }
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}/change-password")]
+        public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordDto dto)
+        {
+            var currentUserIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (currentUserIdStr == null || !int.TryParse(currentUserIdStr, out var currentUserId))
+            {
+                return Unauthorized("Chyba autentizace. Token není platný.");
+            }
+
+            if (currentUserId != id)
+            {
+                return Forbid("Nemáte oprávnění měnit heslo tohoto uživatele.");
+            }
+
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("Uživatel nebyl nalezen.");
+            }
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, dto.NewPassword);
+
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -90,7 +125,6 @@ namespace blogic_crm_back.Data
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
-
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -108,6 +142,90 @@ namespace blogic_crm_back.Data
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);
+        }
+
+        // GET: api/Users/export
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportUsers()
+        {
+            var users = await _context.Users.Include(u => u.Role).ToListAsync();
+
+            var csv = new StringBuilder();
+
+            csv.AppendLine("Id,Username,FirstName,LastName,Email,Phone,SSN,Age,Role");
+
+            foreach (var u in users)
+            {
+                string age = "-";
+                if (!string.IsNullOrEmpty(u.SSN) && u.SSN.Length >= 6)
+                {
+                    age = CalculateAgeFromSSN(u.SSN).ToString();
+                }
+                var phone = $"{u.CountryCode} {u.Number}".Trim();
+
+                csv.AppendLine($"{u.Id}," +
+                               $"{EscapeCsv(u.Username)}," +
+                               $"{EscapeCsv(u.FirstName)}," +
+                               $"{EscapeCsv(u.LastName)}," +
+                               $"{EscapeCsv(u.Email)}," +
+                               $"{EscapeCsv(phone)}," +
+                               $"{EscapeCsv(u.SSN)}," +
+                               $"{EscapeCsv(age)}," +
+                               $"{EscapeCsv(u.Role?.Name ?? "")}");
+            }
+
+            var csvString = csv.ToString();
+            var utf8Bom = Encoding.UTF8.GetPreamble();
+            var csvBytes = Encoding.UTF8.GetBytes(csvString);
+
+            var csvWithBomBytes = new byte[utf8Bom.Length + csvBytes.Length];
+            Buffer.BlockCopy(utf8Bom, 0, csvWithBomBytes, 0, utf8Bom.Length);
+            Buffer.BlockCopy(csvBytes, 0, csvWithBomBytes, utf8Bom.Length, csvBytes.Length);
+
+            var base64Csv = Convert.ToBase64String(csvWithBomBytes);
+
+            return Ok(new { base64Csv });
+        }
+
+        private string EscapeCsv(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "";
+
+            if (value.Contains(',') || value.Contains('"') || value.Contains('\n'))
+            {
+                value = value.Replace("\"", "\"\"");
+                return $"\"{value}\"";
+            }
+
+            return value;
+        }
+
+
+        private int CalculateAgeFromSSN(string ssn)
+        {
+            try
+            {
+                var clean = ssn.Replace("/", "");
+                int year = int.Parse(clean.Substring(0, 2));
+                int month = int.Parse(clean.Substring(2, 2));
+                int day = int.Parse(clean.Substring(4, 2));
+
+                if (month > 50) month -= 50;
+
+                int fullYear = year + (year < 50 ? 2000 : 1900);
+                var birthDate = new DateTime(fullYear, month, day);
+                var today = DateTime.Today;
+
+                int age = today.Year - birthDate.Year;
+                if (birthDate > today.AddYears(-age)) age--;
+
+                return age;
+            }
+            catch
+            {
+                return -1;
+            }
         }
     }
 }

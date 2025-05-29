@@ -111,18 +111,30 @@ public static class DbInitializer
             var contractUsers = new List<ContractUser>
             {
                 new() { ContractId = contracts[0].Id, UserId = clients[0].Id },
+                new() { ContractId = contracts[0].Id, UserId = clients[1].Id },
+                new() { ContractId = contracts[0].Id, UserId = clients[2].Id },
                 new() { ContractId = contracts[0].Id, UserId = advisors[0].Id },
+                new() { ContractId = contracts[0].Id, UserId = advisors[1].Id },
+                new() { ContractId = contracts[0].Id, UserId = advisors[2].Id },
 
                 new() { ContractId = contracts[1].Id, UserId = clients[1].Id },
-                new() { ContractId = contracts[1].Id, UserId = advisors[1].Id },
+                new() { ContractId = contracts[1].Id, UserId = clients[2].Id },
+                new() { ContractId = contracts[1].Id, UserId = advisors[0].Id },
+                new() { ContractId = contracts[1].Id, UserId = advisors[2].Id },
 
-                new() { ContractId = contracts[2].Id, UserId = clients[2].Id },
+                new() { ContractId = contracts[2].Id, UserId = clients[0].Id },
+                new() { ContractId = contracts[2].Id, UserId = advisors[0].Id },
+                new() { ContractId = contracts[2].Id, UserId = advisors[1].Id },
                 new() { ContractId = contracts[2].Id, UserId = advisors[2].Id },
 
                 new() { ContractId = contracts[3].Id, UserId = clients[0].Id },
+                new() { ContractId = contracts[3].Id, UserId = clients[1].Id },
                 new() { ContractId = contracts[3].Id, UserId = advisors[1].Id },
 
+                new() { ContractId = contracts[4].Id, UserId = clients[0].Id },
                 new() { ContractId = contracts[4].Id, UserId = clients[1].Id },
+                new() { ContractId = contracts[4].Id, UserId = clients[2].Id },
+                new() { ContractId = contracts[4].Id, UserId = advisors[1].Id },
                 new() { ContractId = contracts[4].Id, UserId = advisors[2].Id },
 
                 new() { ContractId = contracts[5].Id, UserId = clients[2].Id },
@@ -147,7 +159,6 @@ public static class DbInitializer
                 new() { ContractId = contracts[11].Id, UserId = clients[0].Id },
                 new() { ContractId = contracts[11].Id, UserId = advisors[2].Id }
             };
-
 
             context.ContractUser.AddRange(contractUsers);
             context.SaveChanges();

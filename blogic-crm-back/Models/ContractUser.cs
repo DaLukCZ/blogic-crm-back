@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace blogic_crm_back.Models;
 
-// Join table for many-to-many relationship between contracts and advisors
 public class ContractUser
 {
     [Required]

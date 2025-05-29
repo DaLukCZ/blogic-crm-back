@@ -27,34 +27,32 @@ namespace blogic_crm_back.Data
                 .HasOne(cu => cu.Contract)
                 .WithMany(c => c.Users)
                 .HasForeignKey(cu => cu.ContractId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ContractUser>()
                 .HasOne(cu => cu.User)
                 .WithMany(u => u.AdvisorContracts)
                 .HasForeignKey(cu => cu.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // User - Role relationship
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Contract - Institution relationship
             modelBuilder.Entity<Contract>()
                 .HasOne(c => c.Institution)
                 .WithMany(i => i.Contracts)
                 .HasForeignKey(c => c.InstitutionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Seed default roles
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "Klient" },
                 new Role { Id = 2, Name = "Poradce" },
                 new Role { Id = 3, Name = "Admin" }
             );
         }
+
     }
 }

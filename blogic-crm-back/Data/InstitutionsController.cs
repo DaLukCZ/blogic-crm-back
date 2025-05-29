@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using blogic_crm_back.Dto;
+using blogic_crm_back.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using blogic_crm_back.Models;
 
 namespace blogic_crm_back.Data
 {
@@ -22,19 +18,39 @@ namespace blogic_crm_back.Data
 
         // GET: api/Institutions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Institution>>> GetInstitutions()
+        public async Task<ActionResult<IEnumerable<InstitutionDto>>> GetInstitutions()
         {
-            return await _context.Institutions
+            var institutions = await _context.Institutions
                 .Include(i => i.Contracts)
-                    .ThenInclude(c => c.Users)
-                        .ThenInclude(cu => cu.User)
-                            .ThenInclude(u => u.Role)
+                .ThenInclude(c => c.Users)
+                .ThenInclude(cu => cu.User)
+                .ThenInclude(u => u.Role)
                 .ToListAsync();
+
+            var dtoList = institutions.Select(i => new InstitutionDto
+            {
+                Id = i.Id,
+                Name = i.Name,
+                Contracts = i.Contracts.Select(c => new ContractDto
+                {
+                    Id = c.Id,
+                    ReferenceNumber = c.ReferenceNumber,
+                    Users = c.Users.Select(cu => new UserDto
+                    {
+                        Id = cu.User.Id,
+                        FirstName = cu.User.FirstName,
+                        LastName = cu.User.LastName,
+                        RoleName = cu.User.Role?.Name ?? string.Empty
+                    }).ToList()
+                }).ToList()
+            }).ToList();
+
+            return dtoList;
         }
 
         // GET: api/Institutions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Institution>> GetInstitution(int id)
+        public async Task<ActionResult<InstitutionDto>> GetInstitution(int id)
         {
             var institution = await _context.Institutions
                 .Include(i => i.Contracts)
@@ -48,63 +64,25 @@ namespace blogic_crm_back.Data
                 return NotFound();
             }
 
-            return institution;
-        }
-
-        // PUT: api/Institutions/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutInstitution(int id, Institution institution)
-        {
-            if (id != institution.Id)
+            var dto = new InstitutionDto
             {
-                return BadRequest();
-            }
-
-            _context.Entry(institution).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!InstitutionExists(id))
+                Id = institution.Id,
+                Name = institution.Name,
+                Contracts = institution.Contracts.Select(c => new ContractDto
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                    Id = c.Id,
+                    ReferenceNumber = c.ReferenceNumber,
+                    Users = c.Users.Select(cu => new UserDto
+                    {
+                        Id = cu.User.Id,
+                        FirstName = cu.User.FirstName,
+                        LastName = cu.User.LastName,
+                        RoleName = cu.User.Role?.Name ?? string.Empty
+                    }).ToList()
+                }).ToList()
+            };
 
-            return NoContent();
-        }
-
-        // POST: api/Institutions
-        [HttpPost]
-        public async Task<ActionResult<Institution>> PostInstitution(Institution institution)
-        {
-            _context.Institutions.Add(institution);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetInstitution), new { id = institution.Id }, institution);
-        }
-
-        // DELETE: api/Institutions/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInstitution(int id)
-        {
-            var institution = await _context.Institutions.FindAsync(id);
-            if (institution == null)
-            {
-                return NotFound();
-            }
-
-            _context.Institutions.Remove(institution);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return dto;
         }
 
         private bool InstitutionExists(int id)

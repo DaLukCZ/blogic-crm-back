@@ -199,13 +199,13 @@ namespace blogic_crm_back.Migrations
                     b.HasOne("blogic_crm_back.Models.Contract", "Contract")
                         .WithMany("Users")
                         .HasForeignKey("ContractId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("blogic_crm_back.Models.User", "User")
                         .WithMany("AdvisorContracts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Contract");

@@ -12,8 +12,8 @@ using blogic_crm_back.Data;
 namespace blogic_crm_back.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250528184324_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250529210023_BlogicDB")]
+    partial class BlogicDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -202,13 +202,13 @@ namespace blogic_crm_back.Migrations
                     b.HasOne("blogic_crm_back.Models.Contract", "Contract")
                         .WithMany("Users")
                         .HasForeignKey("ContractId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("blogic_crm_back.Models.User", "User")
                         .WithMany("AdvisorContracts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Contract");
