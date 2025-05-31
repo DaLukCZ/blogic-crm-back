@@ -49,7 +49,7 @@ Frontendová část je dostupná v samostatném repozitáři: [blogic-crm-front]
 
 Pokud je příkaz spuštěn mimo projektovou složku, dojde k chybě.
 
-### 5. Nastavení tajného klíče pro JWT autentizaci
+5. Nastavení tajného klíče pro JWT autentizaci
 
 Pro správné fungování autentizace je nutné nastavit tajný klíč (JWT Secret), který slouží k podepisování tokenů.
 
@@ -57,7 +57,7 @@ Při vývoji se doporučuje využít nástroj **User Secrets**, aby klíč nebyl
 
 ---
 
-#### 🔹 5a. Inicializace User Secrets spuštěním příkazu, který musí být spuštěn ve složce, kde se nachází soubor `.csproj`:
+🔹 5a. Inicializace User Secrets spuštěním příkazu, který musí být spuštěn ve složce, kde se nachází soubor `.csproj`:
 
 ```bash
 dotnet user-secrets init
@@ -67,7 +67,7 @@ Tím se vytvoří vazba mezi projektem a úložištěm tajných hodnot.
 
 ---
 
-#### 🔹 5b. Vygenerování a nastavení tajného klíče
+🔹 5b. Vygenerování a nastavení tajného klíče
 
 Pomocí OpenSSL lze vygenerovat bezpečný náhodný klíč (minimálně 32 znaků):
 
