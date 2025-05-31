@@ -11,7 +11,6 @@ Frontendová část je dostupná v samostatném repozitáři: [blogic-crm-front]
 - ASP.NET Core Web API (.NET 9.0)
 - Entity Framework Core (Code First)
 - MS SQL Server Express
-- Swagger (Swashbuckle) pro dokumentaci API
 
 ---
 
