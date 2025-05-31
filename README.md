@@ -96,37 +96,5 @@ Zde jsou k dispozici všechny dostupné endpointy pro práci se smlouvami, klien
 
 ## 🔗 Související repozitář
 
-Frontend aplikace je dostupný v samostatném repozitáři:  
+Frontend aplikace je dostupná v samostatném repozitáři:  
 ➡️ [https://github.com/DaLukCZ/blogic-crm-front](https://github.com/DaLukCZ/blogic-crm-front)
-
----
-
-## 🔐 JWT autentizace – vývojové nastavení
-
-Pro správné fungování autentizace je nutné nastavit tajný klíč (JWT Secret), který se používá pro podepisování tokenů.
-
-Při vývoji se doporučuje použít **User Secrets**, aby nebyl klíč uložen přímo v souboru `appsettings.json`.
-
-### ✅ Postup:
-
-1. Inicializace úložiště User Secrets (pokud ještě nebylo provedeno):
-
-   ```bash
-   dotnet user-secrets init
-   ```
-
-2. Vygenerování a nastavení klíče (např. 32+ znaků):
-
-   ```bash
-   dotnet user-secrets set "Jwt:Key" "vase-nahodna-tajna-hodnota-zde"
-   ```
-
-Pro vygenerování bezpečného klíče lze použít například:
-
-```bash
-dotnet user-secrets set "Jwt:Key" "$(openssl rand -base64 32)"
-```
-
-Pokud není OpenSSL dostupné, lze zadat ručně např. 32 náhodných znaků.
-
----
