@@ -47,7 +47,7 @@ Frontendová část je dostupná v samostatném repozitáři: [blogic-crm-front]
    dotnet ef database update
    ```
 
-Pokud je příkaz spuštěn mimo projektovou složku, dojde k chybě.
+   Pokud je příkaz spuštěn mimo projektovou složku, dojde k chybě.
 
 5. Nastavení tajného klíče pro JWT autentizaci
 
