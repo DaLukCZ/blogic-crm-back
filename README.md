@@ -20,7 +20,7 @@ Frontendová část je dostupná v samostatném repozitáři: [blogic-crm-front]
 |---------------------|---------------------|
 | .NET SDK            | 9.0                 |
 | Visual Studio       | 2022 nebo novější   |
-| MS SQL Server       | Express (nebo vyšší)|
+| MS SQL Server       | ve Visual Studiu    |
 
 ---
 
