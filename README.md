@@ -36,18 +36,12 @@ Frontendová část je dostupná v samostatném repozitáři: [blogic-crm-front]
 2. Projekt by měl být otevřen v **Visual Studio 2022**.
 
 3. Obnovit NuGet balíčky:
+
    ```bash
    dotnet restore
    ```
 
-4. Databáze se vytvoří pomocí migrací spuštěním příkazu:  
-⚠️ Tento příkaz je nutné spustit ve složce, kde se nachází soubor `.csproj`.
-
-   ```bash
-   cd .\blogic-crm-back\
-   ```
-
-Poté samotný příkaz:
+4. Databáze se vytvoří pomocí migrací spuštěním příkazu, který musí být spuštěn ve složce, kde se nachází soubor `.csproj`:
 
    ```bash
    dotnet ef database update
@@ -63,19 +57,7 @@ Při vývoji se doporučuje využít nástroj **User Secrets**, aby klíč nebyl
 
 ---
 
-#### ⚠️ Důležité:
-
-Příkaz `dotnet user-secrets` je nutné spouštět ve složce, kde se nachází soubor `.csproj`.
-
-   ```bash
-   cd .\blogic-crm-back\
-   ```
-
-Pokud je příkaz spuštěn mimo projektovou složku, dojde k chybě.
-
----
-
-#### 🔹 5a. Inicializace User Secrets
+#### 🔹 5a. Inicializace User Secrets spuštěním příkazu, který musí být spuštěn ve složce, kde se nachází soubor `.csproj`:
 
 ```bash
 dotnet user-secrets init
