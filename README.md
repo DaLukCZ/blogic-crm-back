@@ -51,48 +51,28 @@ Pokud je příkaz spuštěn mimo projektovou složku, dojde k chybě.
 
 5. Nastavení tajného klíče pro JWT autentizaci
 
-Pro správné fungování autentizace je nutné nastavit tajný klíč (JWT Secret), který slouží k podepisování tokenů.
+   Pro správné fungování autentizace je nutné nastavit tajný klíč (JWT Secret), který slouží k podepisování tokenů.
+   Při vývoji se doporučuje využít nástroj **User Secrets**, aby klíč nebyl uložen přímo v souboru `appsettings.json`.
 
-Při vývoji se doporučuje využít nástroj **User Secrets**, aby klíč nebyl uložen přímo v souboru `appsettings.json`.
+   5a. Inicializace User Secrets spuštěním příkazu, který musí být spuštěn ve složce, kde se nachází soubor `.csproj`:
 
----
+      ```bash
+      dotnet user-secrets init
+      ```
 
-🔹 5a. Inicializace User Secrets spuštěním příkazu, který musí být spuštěn ve složce, kde se nachází soubor `.csproj`:
+      Tím se vytvoří vazba mezi projektem a úložištěm tajných hodnot.
 
-```bash
-dotnet user-secrets init
-```
-
-Tím se vytvoří vazba mezi projektem a úložištěm tajných hodnot.
-
----
-
-🔹 5b. Vygenerování a nastavení tajného klíče
-
-Pomocí OpenSSL lze vygenerovat bezpečný náhodný klíč (minimálně 32 znaků):
-
-```bash
-dotnet user-secrets set "Jwt:Key" "$(openssl rand -base64 32)"
-```
-
-✅ Tento příkaz uloží klíč jako tajný údaj do vývojového úložiště a umožní bezpečnou práci s JWT.
-
----
-
-#### ❗ Co dělat, pokud `openssl` není dostupné:
-
-- **Windows**: Nainstalujte [Win32 OpenSSL](https://slproweb.com/products/Win32OpenSSL.html)
-- **Alternativa**: Nastavte klíč ručně:
-
-```bash
-dotnet user-secrets set "Jwt:Key" "Xb1Z9w2K8fMqR7vLpJt6Uc3dEa5NbVmQ"
-```
-6. Spuštění aplikace
-Aplikace se spustí stisknutím zelené šipky „Start“ ve Visual Studiu s vybraným profilem https.
-
-Po spuštění aplikace je databáze automaticky naplněna základními testovacími daty.
-
-API poběží na adrese `https://localhost:7046`.
+   5b. Vygenerování a nastavení tajného klíče:
+   
+      ```bash
+      dotnet user-secrets set "Jwt:Key" "Xb1Z9w2K8fMqR7vLpJt6Uc3dEa5NbVmQ"
+      ```
+7. Spuštění aplikace
+   Aplikace se spustí stisknutím zelené šipky „Start“ ve Visual Studiu s vybraným profilem https.
+   
+   Po spuštění aplikace je databáze automaticky naplněna základními testovacími daty.
+   
+   API poběží na adrese `https://localhost:7046`.
 ## 📚 Dokumentace API
 
 Po spuštění API je automaticky k dispozici Swagger UI na adrese:
